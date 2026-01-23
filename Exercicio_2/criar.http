@@ -1,0 +1,46 @@
+POST http://localhost:2525/imposters
+Content-Type: application/json
+
+{
+  "port": 5002,
+  "protocol": "http",
+  "name": "pesquisa_carros",
+  "stubs": [
+    {
+      "predicates": [
+        {
+          "equals": {
+            "method": "GET",
+            "path": "/api/cars",
+            "query": {
+              "brand": "Toyota"
+            },
+            "headers": {
+              "Accept": "application/json"
+            }
+          }
+        }
+      ],
+      "responses": [
+        {
+          "is": {
+            "statusCode": 200,
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "brand": "Toyota",
+              "results": [
+                {
+                  "id": 1,
+                  "modelo": "Corolla",
+                  "preco": 20000
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

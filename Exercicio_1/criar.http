@@ -1,0 +1,65 @@
+POST http://localhost:2525/imposters
+Content-Type: application/json
+
+{
+  "port": 5001,
+  "protocol": "http",
+  "name": "imposter-marcas",
+  "stubs": [
+    {
+      "predicates": [
+        {
+          "equals": {
+            "method": "GET",
+            "path": "/api/marcas",
+            "headers": {
+              "Accept": "application/json"
+            }
+          }
+        }
+      ],
+      "responses": [
+        {
+          "is": {
+            "statusCode": 200,
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "marcas": [
+                "Toyota",
+                "Audi",
+                "Ford",
+                "Volvo",
+                "Honda"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "predicates": [
+        {
+          "equals": {
+            "method": "GET",
+            "path": "/api/marcas"
+          }
+        }
+      ],
+      "responses": [
+        {
+          "is": {
+            "statusCode": 400,
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "erro": "Header Accept inválido ou em falta"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

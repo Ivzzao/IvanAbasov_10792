@@ -1,0 +1,52 @@
+POST http://localhost:2525/imposters
+Content-Type: application/json
+
+{
+  "port": 6004,
+  "protocol": "http",
+  "name": "api-biblioteca-digital",
+  "stubs": [
+    {
+      "responses": [{ "is": { "statusCode": 200, "body": [{ "id": 1, "titulo": "O Alquimista", "status": "disponivel" }, { "id": 2, "titulo": "1984", "status": "emprestado" }] } }],
+      "predicates": [{ "equals": { "method": "GET", "path": "/api/livros" } }]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 409, "body": { "erro": "Livro já se encontra emprestado" } } }],
+      "predicates": [
+        { "equals": { "method": "POST", "path": "/api/emprestimos" } },
+        { "deepEquals": { "body": { "livro_id": 2 } } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 201, "body": { "mensagem": "Empréstimo registado com sucesso", "id_emprestimo": 500 } } }],
+      "predicates": [
+        { "equals": { "method": "POST", "path": "/api/emprestimos" } },
+        { "exists": { "body": { "cliente": true, "livro_id": true, "data_emprestimo": true } } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 404, "body": { "erro": "Devolução impossível: Empréstimo não encontrado ou já devolvido" } } }],
+      "predicates": [
+        { "equals": { "method": "PUT", "path": "/api/emprestimos/999/devolucao" } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 200, "body": { "mensagem": "Livro devolvido com sucesso" } } }],
+      "predicates": [
+        { "matches": { "method": "PUT", "path": "/api/emprestimos/\\d+/devolucao" } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 400, "body": { "erro": "Não é permitido remover: O livro está atualmente emprestado" } } }],
+      "predicates": [
+        { "equals": { "method": "DELETE", "path": "/api/livros/2" } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 200, "body": { "mensagem": "Livro removido do catálogo" } } }],
+      "predicates": [
+        { "equals": { "method": "DELETE", "path": "/api/livros/1" } }
+      ]
+    }
+  ]
+}

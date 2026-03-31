@@ -1,0 +1,60 @@
+POST http://localhost:2525/imposters
+Content-Type: application/json
+
+{
+  "port": 6003,
+  "protocol": "http",
+  "name": "api-reservas-hotel",
+  "stubs": [
+    {
+      "responses": [{ "is": { "statusCode": 200, "body": [{ "id": 50, "cliente": "Ana Mendes", "checkin": "2024-06-01", "checkout": "2024-06-05", "quarto": "Suite" }] } }],
+      "predicates": [{ "equals": { "method": "GET", "path": "/api/reservas" } }]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 400, "body": { "erro": "Data de checkout não pode ser anterior ao checkin" } } }],
+      "predicates": [
+        { "equals": { "method": "POST", "path": "/api/reservas" } },
+        { "contains": { "body": { "checkin": "2024-12-31", "checkout": "2024-12-01" } } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 409, "body": { "erro": "Sem disponibilidade para o tipo de quarto selecionado" } } }],
+      "predicates": [
+        { "equals": { "method": "POST", "path": "/api/reservas" } },
+        { "contains": { "body": { "tipo_quarto": "Presidencial" } } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 201, "body": { "id": 51, "mensagem": "Reserva confirmada com sucesso" } } }],
+      "predicates": [
+        { "equals": { "method": "POST", "path": "/api/reservas" } },
+        { "exists": { "body": { "cliente": true, "checkin": true, "checkout": true, "tipo_quarto": true } } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 400, "body": { "erro": "Alteração recusada: Prazo de 24h antes do checkin expirado" } } }],
+      "predicates": [
+        { "equals": { "method": "PUT", "path": "/api/reservas/50" } },
+        { "contains": { "headers": { "X-Request-Time": "Late" } } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 200, "body": { "mensagem": "Reserva alterada com sucesso" } } }],
+      "predicates": [
+        { "matches": { "method": "PUT", "path": "/api/reservas/\\d+" } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 403, "body": { "erro": "Não é permitido cancelar após o checkin" } } }],
+      "predicates": [
+        { "equals": { "method": "DELETE", "path": "/api/reservas/50" } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 200, "body": { "mensagem": "Reserva cancelada" } } }],
+      "predicates": [
+        { "matches": { "method": "DELETE", "path": "/api/reservas/\\d+" } }
+      ]
+    }
+  ]
+}

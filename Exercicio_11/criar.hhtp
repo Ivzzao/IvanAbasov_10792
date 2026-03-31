@@ -1,0 +1,38 @@
+POST http://localhost:2525/imposters
+Content-Type: application/json
+
+{
+  "port": 5011,
+  "protocol": "http",
+  "name": "tasks_create",
+  "stubs": [
+    {
+      "predicates": [
+        {
+          "equals": {
+            "method": "POST",
+            "path": "/api/tasks",
+            "headers": {
+              "Content-Type": "application/json"
+            }
+          }
+        }
+      ],
+      "responses": [
+        {
+          "is": {
+            "statusCode": 201,
+            "headers": {
+              "Content-Type": "application/json",
+              "Location": "/api/tasks/456"
+            },
+            "body": {
+              "id": 456,
+              "status": "created"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

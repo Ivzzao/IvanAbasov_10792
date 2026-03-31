@@ -1,0 +1,62 @@
+POST http://localhost:2525/imposters
+Content-Type: application/json
+
+{
+  "port": 5013,
+  "protocol": "http",
+  "name": "profile_api",
+  "stubs": [
+    {
+      "predicates": [
+        {
+          "equals": {
+            "method": "GET",
+            "path": "/api/profile",
+            "headers": {
+              "Authorization": "Bearer validtoken"
+            }
+          }
+        }
+      ],
+      "responses": [
+        {
+          "is": {
+            "statusCode": 200,
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "username": "user1",
+              "email": "ivan@gmail.com",
+              "full_name": "User One"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "predicates": [
+        {
+          "equals": {
+            "method": "GET",
+            "path": "/api/profile"
+          }
+        }
+      ],
+      "responses": [
+        {
+          "is": {
+            "statusCode": 403,
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "error": "forbidden",
+              "message": "Acesso negado. Token inválido ou ausente."
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

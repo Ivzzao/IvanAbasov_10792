@@ -1,0 +1,45 @@
+POST http://localhost:2525/imposters
+Content-Type: application/json
+
+{
+  "port": 5004,
+  "protocol": "http",
+  "name": "login_sucesso",
+  "stubs": [
+    {
+      "predicates": [
+        {
+          "equals": {
+            "method": "POST",
+            "path": "/api/login",
+            "headers": {
+              "Content-Type": "application/json"
+            }
+          }
+        },
+        {
+          "deepEquals": {
+            "body": {
+              "username": "admin",
+              "password": "secret"
+            }
+          }
+        }
+      ],
+      "responses": [
+        {
+          "is": {
+            "statusCode": 200,
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "status": "ok",
+              "token": "validtoken"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

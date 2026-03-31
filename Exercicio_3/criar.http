@@ -1,0 +1,36 @@
+POST http://localhost:2525/imposters
+Content-Type: application/json
+
+{
+  "port": 5003,
+  "protocol": "http",
+  "name": "lista_carros",
+  "stubs": [
+    {
+      "predicates": [
+        {
+          "equals": {
+            "method": "GET",
+            "path": "/api/cars",
+            "headers": {
+              "Accept": "application/json"
+            }
+          }
+        }
+      ],
+      "responses": [
+        {
+          "is": {
+            "statusCode": 200,
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "results": []
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

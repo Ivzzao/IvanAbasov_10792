@@ -1,0 +1,64 @@
+POST http://localhost:2525/imposters
+Content-Type: application/json
+
+{
+  "port": 6000,
+  "protocol": "http",
+  "name": "api-gestao-alunos",
+  "stubs": [
+    {
+      "responses": [{ "is": { "statusCode": 200, "body": [{ "id": 1, "nome": "João Silva", "idade": 15, "curso": "Informática" }] } }],
+      "predicates": [{ "equals": { "method": "GET", "path": "/api/alunos" } }]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 200, "body": { "id": 1, "nome": "João Silva", "idade": 15, "curso": "Informática" } } }],
+      "predicates": [{ "equals": { "method": "GET", "path": "/api/alunos/1" } }]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 400, "body": { "erro": "Idade mínima não atingida" } } }],
+      "predicates": [
+        { "equals": { "method": "POST", "path": "/api/alunos" } },
+        { "exists": { "body": { "idade": true } } },
+        { "deepEquals": { "body": { "idade": 9 } } } 
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 404, "body": { "erro": "Curso não encontrado" } } }],
+      "predicates": [
+        { "equals": { "method": "POST", "path": "/api/alunos" } },
+        { "contains": { "body": { "curso": "Inexistente" } } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 201, "body": { "mensagem": "Aluno adicionado com sucesso" } } }],
+      "predicates": [
+        { "equals": { "method": "POST", "path": "/api/alunos" } },
+        { "exists": { "body": { "nome": true, "idade": true, "curso": true } } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 200, "body": { "mensagem": "Dados atualizados" } } }],
+      "predicates": [
+        { "equals": { "method": "PUT", "path": "/api/alunos/1" } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 404, "body": { "erro": "Aluno não encontrado" } } }],
+      "predicates": [{ "equals": { "method": "PUT" } }, { "matches": { "path": "/api/alunos/99" } }]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 403, "body": { "erro": "Acesso negado: Requer administrador" } } }],
+      "predicates": [
+        { "equals": { "method": "DELETE" } },
+        { "not": { "contains": { "headers": { "Role": "Admin" } } } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 200, "body": { "mensagem": "Aluno removido" } } }],
+      "predicates": [
+        { "equals": { "method": "DELETE", "path": "/api/alunos/1" } },
+        { "contains": { "headers": { "Role": "Admin" } } }
+      ]
+    }
+  ]
+}

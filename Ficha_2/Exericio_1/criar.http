@@ -2,7 +2,7 @@ POST http://localhost:2525/imposters
 Content-Type: application/json
 
 {
-  "port": 6000,
+  "port": 6001,
   "protocol": "http",
   "name": "api-gestao-alunos",
   "stubs": [

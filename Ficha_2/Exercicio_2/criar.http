@@ -1,0 +1,55 @@
+POST http://localhost:2525/imposters
+Content-Type: application/json
+
+{
+  "port": 6002,
+  "protocol": "http",
+  "name": "api-gestao-inventario",
+  "stubs": [
+    {
+      "responses": [{ "is": { "statusCode": 200, "body": [{ "id": 101, "nome": "Portátil", "preco": 800, "quantidade": 15 }] } }],
+      "predicates": [{ "equals": { "method": "GET", "path": "/api/produtos" } }]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 400, "body": { "erro": "Valor inválido: Quantidade não pode ser negativa" } } }],
+      "predicates": [
+        { "equals": { "method": "POST", "path": "/api/produtos" } },
+        { "exists": { "body": { "quantidade": true } } },
+        { "matches": { "body": { "quantidade": "^-" } } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 201, "body": { "mensagem": "Produto criado com sucesso" } } }],
+      "predicates": [
+        { "equals": { "method": "POST", "path": "/api/produtos" } },
+        { "exists": { "body": { "nome": true, "preco": true, "quantidade": true } } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 200, "body": { "mensagem": "Stock atualizado com sucesso" } } }],
+      "predicates": [
+        { "equals": { "method": "PUT" } },
+        { "matches": { "path": "/api/produtos/\\d+/stock" } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 404, "body": { "erro": "Produto inexistente" } } }],
+      "predicates": [
+        { "equals": { "method": "GET" } },
+        { "matches": { "path": "/api/produtos/999" } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 400, "body": { "erro": "Não é possível remover: Produto ainda tem stock disponível" } } }],
+      "predicates": [
+        { "equals": { "method": "DELETE", "path": "/api/produtos/101" } }
+      ]
+    },
+    {
+      "responses": [{ "is": { "statusCode": 200, "body": { "mensagem": "Produto descontinuado removido" } } }],
+      "predicates": [
+        { "equals": { "method": "DELETE", "path": "/api/produtos/202" } }
+      ]
+    }
+  ]
+}
